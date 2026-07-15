@@ -60,7 +60,11 @@ python3 mira_desktop.py --can can0
 
 Tabs:
 - **Topics** — live table + selectable **Hz history plot** per topic, CSV export
-- **CAN** — live frame table, total bus load (frames/s), pause/resume
+- **Inspector** — view the **latest message of ANY topic as YAML**, live
+- **PointCloud** — top-down viewer for **any `PointCloud2` topic (lidar or
+  radar)**, points color-coded by height, zoom/pan with the mouse
+- **CAN** — live frame table, total bus load, **per-ID rate history plot**,
+  pause/resume
 - **Radar Objects** — **2D bird's-eye scatter plot** with per-class colors and
   legend, class filter checkboxes, object table, CSV export
 - **Tools** — RViz2 launcher, **rosbag record** (all or selected topics,
