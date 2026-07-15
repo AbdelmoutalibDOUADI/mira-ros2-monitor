@@ -1,0 +1,15 @@
+# MIRA health rules — adapt topic names to your setup
+# A topic outside its bounds shows FAIL (red) in the Health column.
+topics:
+  # ARS408 radar pointcloud (adapt to your radar_to_pointcloud node output)
+  "/radar/pointcloud":
+    min_hz: 10
+    max_hz: 25
+
+  # Lidar pointcloud
+  "/lidar/points":
+    min_hz: 8
+
+  # Example: raw CAN radar objects
+  # "/ars408/objects":
+  #   min_hz: 12

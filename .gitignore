@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+CSV/
+MD/
+DOT/
+Bag/
