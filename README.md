@@ -37,6 +37,27 @@ Features:
 - Dark GitHub-style theme, auto-refresh every 500 ms, zero external dependency
   (pure Python stdlib HTTP server + vanilla JS canvas)
 
+
+## Desktop application (MIRA Desktop)
+
+A **native single-window GUI** (DearPyGui, RUBI-style) with processing tools:
+
+```bash
+pip install dearpygui
+python3 mira_desktop.py --can can0
+```
+
+Tabs:
+- **Topics** — live table + selectable **Hz history plot** per topic, CSV export
+- **CAN** — live frame table, total bus load (frames/s), pause/resume
+- **Radar Objects** — **2D bird's-eye scatter plot** with per-class colors and
+  legend, class filter checkboxes, object table, CSV export
+- **Tools** — RViz2 launcher, **rosbag record** (all or selected topics,
+  saved under `Bag/`), **rosbag play** (path, loop, rate control)
+
+Requires a display (X11) — same setup as RViz2 in Docker
+(`xhost +local:root` on the host).
+
 ## Requirements
 
 - ROS 2 Humble or Jazzy, **sourced** (`rclpy` comes from ROS, not pip)
