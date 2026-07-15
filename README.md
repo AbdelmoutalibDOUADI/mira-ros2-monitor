@@ -17,6 +17,26 @@ No GUI, no X11 needed for monitoring — runs in any terminal, in Docker, or ove
 | `r` | **Launch RViz2** | spawns `rviz2` for 3D visualization (requires display/X11) |
 | `q` | Quit | |
 
+
+## Graphical interface (MIRA Web)
+
+Prefer a real GUI? Run the **browser dashboard** — no X11 required:
+
+```bash
+python3 mira_web.py --can can0
+# then open http://localhost:8080
+```
+
+With Docker started using `--net host`, your host browser reaches it directly.
+
+Features:
+- Same three views (Topics / CAN / Radar Objects) as tabs
+- **Real-time 2D bird's-eye radar plot** — detected objects drawn with range
+  rings, color-coded by class, with velocity vectors
+- **▶ RViz2 button** to launch 3D visualization
+- Dark GitHub-style theme, auto-refresh every 500 ms, zero external dependency
+  (pure Python stdlib HTTP server + vanilla JS canvas)
+
 ## Requirements
 
 - ROS 2 Humble or Jazzy, **sourced** (`rclpy` comes from ROS, not pip)
