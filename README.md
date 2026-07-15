@@ -7,6 +7,17 @@ No GUI, no X11 needed for monitoring — runs in any terminal, in Docker, or ove
 ![python](https://img.shields.io/badge/python-3.8%2B-green)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
 
+## Quick start — one command
+
+```bash
+git clone https://github.com/AbdelmoutalibDOUADI/mira-ros2-monitor.git
+cd mira-ros2-monitor && sudo ./install.sh
+mira_mivia            # launches the desktop app, auto-detects CAN
+```
+
+Other modes: `mira_mivia web` (browser GUI) · `mira_mivia tui` (terminal UI).
+The launcher sources ROS2 automatically and detects `can0`/`vcan0` by itself.
+
 ## Views (keyboard navigation)
 
 | Key | View | Content |

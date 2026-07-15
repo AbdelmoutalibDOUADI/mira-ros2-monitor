@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# =============================================================================
+#  mira_mivia — one-command launcher for MIRA
+#  Sources ROS2, auto-detects the CAN interface, launches MIRA Desktop.
+#
+#  Usage:
+#    mira_mivia               # desktop GUI, auto CAN detection
+#    mira_mivia web           # browser GUI (http://localhost:8080)
+#    mira_mivia tui           # terminal UI
+#    mira_mivia --can vcan0   # force an interface (any extra args pass through)
+# =============================================================================
+set -e
+
+# ---- locate the MIRA install directory (where this script's repo lives) ----
+MIRA_DIR="${MIRA_DIR:-$(dirname "$(readlink -f "$0")")/..}"
+if [ ! -f "$MIRA_DIR/mira_desktop.py" ]; then
+    # fallback: common locations
+    for d in /ros2_ws/mira-ros2-monitor "$HOME/mira-ros2-monitor"; do
+        [ -f "$d/mira_desktop.py" ] && MIRA_DIR="$d" && break
+    done
+fi
+if [ ! -f "$MIRA_DIR/mira_desktop.py" ]; then
+    echo "[mira_mivia] MIRA not found. Set MIRA_DIR=/path/to/mira-ros2-monitor"
+    exit 1
+fi
+
+# ---- source ROS2 if not already sourced ----
+if [ -z "$ROS_DISTRO" ]; then
+    for distro in humble jazzy iron; do
+        if [ -f "/opt/ros/$distro/setup.bash" ]; then
+            # shellcheck disable=SC1090
+            source "/opt/ros/$distro/setup.bash"
+            echo "[mira_mivia] sourced ROS2 $distro"
+            break
+        fi
+    done
+fi
+[ -z "$ROS_DISTRO" ] && { echo "[mira_mivia] no ROS2 install found"; exit 1; }
+
+# ---- source local workspace if present ----
+for ws in /ros2_ws "$HOME/ros2_ws"; do
+    [ -f "$ws/install/setup.bash" ] && source "$ws/install/setup.bash" && break
+done
+
+# ---- pick the UI mode ----
+MODE="desktop"
+case "$1" in
+    web) MODE="web"; shift ;;
+    tui) MODE="tui"; shift ;;
+    desktop) shift ;;
+esac
+
+# ---- auto-detect CAN interface unless --can given ----
+ARGS=("$@")
+if [[ ! " $* " =~ " --can " ]]; then
+    for iface in can0 can1 vcan0; do
+        if [ -d "/sys/class/net/$iface" ]; then
+            ARGS+=(--can "$iface")
+            echo "[mira_mivia] CAN interface detected: $iface"
+            break
+        fi
+    done
+fi
+
+# ---- launch ----
+cd "$MIRA_DIR"
+case "$MODE" in
+    web)     exec python3 mira_web.py "${ARGS[@]}" ;;
+    tui)     exec python3 mira.py "${ARGS[@]}" ;;
+    desktop) exec python3 mira_desktop.py "${ARGS[@]}" ;;
+esac
