@@ -44,9 +44,11 @@ done
 
 # ---- pick the UI mode ----
 MODE="desktop"
+[ "$(basename "$0")" = "ars_miviacar" ] && MODE="radar"
 case "$1" in
     web) MODE="web"; shift ;;
     tui) MODE="tui"; shift ;;
+    radar) MODE="radar"; shift ;;
     desktop) shift ;;
 esac
 
@@ -67,5 +69,6 @@ cd "$MIRA_DIR"
 case "$MODE" in
     web)     exec python3 mira_web.py "${ARGS[@]}" ;;
     tui)     exec python3 mira.py "${ARGS[@]}" ;;
+    radar)   exec python3 ars_miviacar.py "${ARGS[@]}" ;;
     desktop) exec python3 mira_desktop.py "${ARGS[@]}" ;;
 esac

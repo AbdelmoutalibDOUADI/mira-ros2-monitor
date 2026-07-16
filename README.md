@@ -49,6 +49,32 @@ Features:
   (pure Python stdlib HTTP server + vanilla JS canvas)
 
 
+
+## ARS_MiviaCar — dedicated dual-radar analyzer
+
+A **specialized desktop application** for deep analysis of the Continental
+ARS408-21 radars (front + rear) at the CAN level:
+
+```bash
+ars_miviacar                    # front (SensorId 0) + rear (SensorId 1) on can0
+ars_miviacar --single 0         # analyze one radar only
+ars_miviacar --can vcan0        # simulation
+```
+
+- **Overview** — full `RadarState` decoding per radar: max distance config,
+  output type, Tx power, quality/extended-info flags, motion input state,
+  RCS threshold, NVM status, **error flags** (voltage, temperature,
+  interference, persistent), and **measured cycle rate** vs the expected
+  ≈ 13.9 Hz (72 ms) of the 77 GHz sensor
+- **Objects** — **vehicle-centric merged view**: front radar objects plotted
+  forward, rear objects backward, color-coded by class, with full table
+  including **probability of existence** and **measurement state** (0x60C)
+- **Clusters** — raw cluster echoes (0x701) when the radar is in cluster mode
+- **RCS Analysis** — live **RCS histogram** + **RCS vs distance scatter**
+  per radar, with reference ranges (pedestrian ≈ -10..0 dBm², car ≈ 0..20,
+  truck ≈ 20..40)
+- **CAN Raw** — every radar frame live with decoded names per sensor
+
 ## Desktop application (MIRA Desktop)
 
 A **native single-window GUI** (DearPyGui, RUBI-style) with processing tools:
