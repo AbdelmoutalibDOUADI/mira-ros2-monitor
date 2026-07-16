@@ -595,7 +595,7 @@ class App:
             age = now - self.node.cloud_stamp if self.node.cloud_stamp else 0
             dpg.set_value("pc_info",
                           f"{n} points"
-                          f" (showing ≤{MAX_CLOUD_POINTS})"
+                          f" (showing <={MAX_CLOUD_POINTS})"
                           f" - last msg {age:.1f}s ago")
 
         # ---- CAN ---- #
@@ -672,7 +672,7 @@ class App:
         # ---- footer ---- #
         up = int(t_rel)
         n_obj = len(self.can.objects) if self.can else 0
-        rec = "REC ●" if self.record_proc else ""
+        rec = "REC *" if self.record_proc else ""
         dpg.set_value("footer",
                       f"uptime {up // 60:02d}:{up % 60:02d}   |   "
                       f"topics: {len(self.node.stats)}   |   "
