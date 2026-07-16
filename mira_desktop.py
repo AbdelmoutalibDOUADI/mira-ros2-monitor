@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-MIRA Desktop — Live diagnostic interface for ROS2 + CAN (DearPyGui)
+MIRA Desktop - Live diagnostic interface for ROS2 + CAN (DearPyGui)
 ===================================================================
 A single-window desktop application to diagnose an entire robot live:
-lidar, radar, any ROS2 topic, and the raw CAN bus — in one place.
+lidar, radar, any ROS2 topic, and the raw CAN bus - in one place.
 
 Tabs
 ----
-  * Topics      — live table (Hz, bandwidth, count) + Hz history plot
-  * Inspector   — view the latest message of ANY topic as YAML, live
-  * PointCloud  — top-down viewer for ANY PointCloud2 topic
+  * Topics      - live table (Hz, bandwidth, count) + Hz history plot
+  * Inspector   - view the latest message of ANY topic as YAML, live
+  * PointCloud  - top-down viewer for ANY PointCloud2 topic
                   (lidar or radar), points color-coded by height
-  * CAN         — live frame table, bus load, per-ID rate history plot
-  * Radar       — ARS408 objects: 2D bird's-eye plot, class filters, CSV
-  * Tools       — RViz2 launcher, rosbag record / play, CSV exports
+  * CAN         - live frame table, bus load, per-ID rate history plot
+  * Radar       - ARS408 objects: 2D bird's-eye plot, class filters, CSV
+  * Tools       - RViz2 launcher, rosbag record / play, CSV exports
 
 Usage
 -----
@@ -22,9 +22,9 @@ Usage
     pip install dearpygui
     python3 mira_desktop.py --can can0
 
-Requires a display (X11) — same setup as RViz2 in Docker.
+Requires a display (X11) - same setup as RViz2 in Docker.
 
-Author: Abdelmoutalib Douadi — MIVIA Lab, UNISA (2026)
+Author: Abdelmoutalib Douadi - MIVIA Lab, UNISA (2026)
 License: MIT
 """
 
@@ -64,15 +64,15 @@ CLASS_RGBA = {
 # height buckets for pointcloud coloring (z in meters)
 Z_BUCKETS = [
     ("z < 0 m",      lambda z: z < 0.0,          (88, 166, 255, 255)),
-    ("0 – 0.5 m",    lambda z: 0.0 <= z < 0.5,   (63, 185, 80, 255)),
-    ("0.5 – 1.5 m",  lambda z: 0.5 <= z < 1.5,   (210, 153, 34, 255)),
-    ("1.5 – 3 m",    lambda z: 1.5 <= z < 3.0,   (248, 81, 73, 255)),
-    ("z ≥ 3 m",      lambda z: z >= 3.0,         (188, 140, 255, 255)),
+    ("0 - 0.5 m",    lambda z: 0.0 <= z < 0.5,   (63, 185, 80, 255)),
+    ("0.5 - 1.5 m",  lambda z: 0.5 <= z < 1.5,   (210, 153, 34, 255)),
+    ("1.5 - 3 m",    lambda z: 1.5 <= z < 3.0,   (248, 81, 73, 255)),
+    ("z >= 3 m",      lambda z: z >= 3.0,         (188, 140, 255, 255)),
 ]
 
 
 # =========================================================================== #
-#  Diagnostic node — extends MiraNode with inspector + pointcloud viewer
+#  Diagnostic node - extends MiraNode with inspector + pointcloud viewer
 # =========================================================================== #
 class DiagnosticNode(MiraNode):
     def __init__(self, topic_filter: str = ""):
@@ -158,7 +158,7 @@ class DiagnosticNode(MiraNode):
             self.cloud_stamp = time.monotonic()
 
     def cloud_points(self):
-        """Decode latest PointCloud2 → (xs_by_bucket, ys_by_bucket, n_total)."""
+        """Decode latest PointCloud2 -> (xs_by_bucket, ys_by_bucket, n_total)."""
         with self.cloud_lock:
             msg = self._cloud_msg
         empty = [[[], []] for _ in Z_BUCKETS]
@@ -176,7 +176,7 @@ class DiagnosticNode(MiraNode):
                 x, y, z = float(p[0]), float(p[1]), float(p[2])
                 for bi, (_, test, _) in enumerate(Z_BUCKETS):
                     if test(z):
-                        # ROS: x forward, y left → plot: X = -y, Y = x
+                        # ROS: x forward, y left -> plot: X = -y, Y = x
                         buckets[bi][0].append(-y)
                         buckets[bi][1].append(x)
                         break
@@ -249,7 +249,7 @@ class App:
             os.killpg(os.getpgid(self.record_proc.pid), signal.SIGINT)
             self.record_proc = None
             dpg.set_item_label("btn_record", "START recording")
-            self.status("Recording stopped — bag saved under Bag/")
+            self.status("Recording stopped - bag saved under Bag/")
 
     def toggle_play(self):
         if self.play_proc is None:
@@ -290,7 +290,7 @@ class App:
                             f"{o.dist_lat:.2f}", f"{o.vrel_long:.2f}",
                             f"{o.vrel_lat:.2f}", f"{o.rcs:.1f}",
                             DYNPROP_NAMES.get(o.dyn_prop, "?")])
-        self.status(f"Exported {len(objs)} objects → {fname}")
+        self.status(f"Exported {len(objs)} objects -> {fname}")
 
     def export_topics_csv(self):
         fname = f"exports/topics_{datetime.now():%Y%m%d_%H%M%S}.csv"
@@ -301,7 +301,7 @@ class App:
                 st = self.node.stats[name]
                 w.writerow([name, st.type_name, f"{st.rate_hz():.2f}",
                             f"{st.bandwidth_bps():.0f}", st.count])
-        self.status(f"Exported topics → {fname}")
+        self.status(f"Exported topics -> {fname}")
 
     def status(self, msg: str, error: bool = False):
         dpg.set_value("status_text", msg)
@@ -327,7 +327,7 @@ class App:
         with dpg.window(tag="main"):
             with dpg.group(horizontal=True):
                 dpg.add_text("MIRA", color=(88, 166, 255))
-                dpg.add_text("Live Diagnostic Interface — ROS2 + CAN",
+                dpg.add_text("Live Diagnostic Interface - ROS2 + CAN",
                              color=(139, 148, 158))
                 dpg.add_spacer(width=30)
                 dpg.add_text("", tag="status_text", color=(63, 185, 80))
@@ -344,7 +344,7 @@ class App:
             dpg.add_separator()
             dpg.add_text("", tag="footer", color=(139, 148, 158))
 
-        dpg.create_viewport(title="MIRA — Live Diagnostic Interface",
+        dpg.create_viewport(title="MIRA - Live Diagnostic Interface",
                             width=1280, height=800)
         dpg.setup_dearpygui()
         dpg.show_viewport()
@@ -396,7 +396,7 @@ class App:
             with dpg.plot(height=-1, width=-1, tag="pc_plot"):
                 dpg.add_plot_legend()
                 dpg.add_plot_axis(dpg.mvXAxis,
-                                  label="lateral (m)  ← left", tag="pc_x")
+                                  label="lateral (m)  <- left", tag="pc_x")
                 with dpg.plot_axis(dpg.mvYAxis,
                                    label="forward (m)", tag="pc_y"):
                     for label, _, rgba in Z_BUCKETS:
@@ -460,7 +460,7 @@ class App:
                 with dpg.plot(height=470, width=540, tag="radar_plot"):
                     dpg.add_plot_legend()
                     dpg.add_plot_axis(dpg.mvXAxis,
-                                      label="lateral (m)  ← left",
+                                      label="lateral (m)  <- left",
                                       tag="radar_x")
                     with dpg.plot_axis(dpg.mvYAxis,
                                        label="longitudinal (m)",
@@ -557,7 +557,7 @@ class App:
                     "max_hz", float("inf"))
                 health = ("OK", green) if ok else ("FAIL", red)
             else:
-                health = ("—", dim)
+                health = ("-", dim)
             rows.append([
                 (name, None), (st.type_name.split("/")[-1], dim),
                 (f"{hz:.1f}", green if hz > 0 else dim),
@@ -585,7 +585,7 @@ class App:
             st = self.node.stats.get(self.node.inspect_topic)
             if st:
                 dpg.set_value("inspect_info",
-                              f"{st.type_name} — {st.rate_hz():.1f} Hz")
+                              f"{st.type_name} - {st.rate_hz():.1f} Hz")
 
         # ---- pointcloud ---- #
         if self.node.cloud_topic:
@@ -596,7 +596,7 @@ class App:
             dpg.set_value("pc_info",
                           f"{n} points"
                           f" (showing ≤{MAX_CLOUD_POINTS})"
-                          f" — last msg {age:.1f}s ago")
+                          f" - last msg {age:.1f}s ago")
 
         # ---- CAN ---- #
         if self.can and not self.can_paused:
@@ -702,7 +702,7 @@ class App:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="MIRA Desktop — live diagnostic interface for ROS2 + CAN")
+        description="MIRA Desktop - live diagnostic interface for ROS2 + CAN")
     parser.add_argument("--filter", default="",
                         help="only ROS topics containing this string")
     parser.add_argument("--rules", default="",

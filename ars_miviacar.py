@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-ARS_MiviaCar — Dedicated dual ARS408-21 radar analysis software
+ARS_MiviaCar - Dedicated dual ARS408-21 radar analysis software
 ===============================================================
 Full CAN-level analysis of the Continental ARS408-21 77 GHz radars
 mounted on the MiviaCar research vehicle (front + rear).
 
 Tabs
 ----
-  * Overview     — per-radar RadarState: sensor ID, max distance, output
+  * Overview     - per-radar RadarState: sensor ID, max distance, output
                    type, power cfg, quality/ext-info flags, motion RX,
                    RCS threshold, ERROR FLAGS, measured cycle rate
-  * Objects      — vehicle-centric bird's-eye plot (front + rear merged),
+  * Objects      - vehicle-centric bird's-eye plot (front + rear merged),
                    full object table: class, distance, velocity, RCS,
                    probability of existence, measurement state, motion
-  * Clusters     — raw cluster echoes (0x701) table + scatter plot
-  * RCS Analysis — RCS histogram + RCS vs distance scatter, statistics
-  * CAN Raw      — every radar CAN frame live: ID, name, rate, data hex
+  * Clusters     - raw cluster echoes (0x701) table + scatter plot
+  * RCS Analysis - RCS histogram + RCS vs distance scatter, statistics
+  * CAN Raw      - every radar CAN frame live: ID, name, rate, data hex
 
 Radar physics reference (ARS408-21):
-  * operating band 76..77 GHz, cycle time ~72 ms (≈ 13.9 Hz)
+  * operating band 76..77 GHz, cycle time ~72 ms (~ 13.9 Hz)
   * far field: 0.25..250 m, near field: 0.25..70..100 m
   * object classes: point, car, truck, pedestrian, motorcycle,
     bicycle, wide
@@ -31,9 +31,9 @@ Usage
     python3 ars_miviacar.py --can vcan0 --front 0 --rear 1
     python3 ars_miviacar.py --can can0 --single 0     # only one radar
 
-Requires a display (X11) — same setup as RViz2 in Docker.
+Requires a display (X11) - same setup as RViz2 in Docker.
 
-Author: Abdelmoutalib Douadi — MIVIA Lab, UNISA (2026)
+Author: Abdelmoutalib Douadi - MIVIA Lab, UNISA (2026)
 License: MIT
 """
 
@@ -335,7 +335,7 @@ class CanReader(threading.Thread):
 #  Application
 # =========================================================================== #
 # =========================================================================== #
-#  Color science — spectrum (Jet) mapping for RCS
+#  Color science - spectrum (Jet) mapping for RCS
 # =========================================================================== #
 def jet(v: float):
     """Map v in [0,1] to the classic Jet spectrum colormap (RGBA)."""
@@ -347,12 +347,12 @@ def jet(v: float):
 
 
 def rcs_color(rcs: float):
-    """RCS -30..+40 dBm² → spectrum color."""
+    """RCS -30..+40 dBm2 -> spectrum color."""
     return jet((rcs + 30.0) / 70.0)
 
 
 # =========================================================================== #
-#  Application — professional radar console
+#  Application - professional radar console
 # =========================================================================== #
 PPI_SIZE = 640
 RD_ROWS, RD_COLS = 36, 48          # doppler bins x range bins
@@ -413,7 +413,7 @@ class App:
                             PROB_EXIST.get(o.prob_exist, "?"),
                             MEAS_STATE.get(o.meas_state, "?"),
                             DYNPROP.get(o.dyn_prop, "?")])
-        self.status(f"Exported → {fname}")
+        self.status(f"Exported -> {fname}")
 
     # ------------------------------------------------------------------ #
     #  UI
@@ -440,8 +440,8 @@ class App:
         with dpg.window(tag="main"):
             with dpg.group(horizontal=True):
                 dpg.add_text("ARS_MiviaCar", color=ACCENT)
-                dpg.add_text("|  Continental ARS408-21 · 76–77 GHz "
-                             "·  dual-radar analysis console",
+                dpg.add_text("|  Continental ARS408-21  |  76-77 GHz "
+                             "-  dual-radar analysis console",
                              color=(120, 140, 160))
                 dpg.add_spacer(width=30)
                 dpg.add_text("", tag="status_text", color=ACCENT)
@@ -455,7 +455,7 @@ class App:
             dpg.add_separator()
             dpg.add_text("", tag="footer", color=(120, 140, 160))
 
-        dpg.create_viewport(title="ARS_MiviaCar — Radar Analysis Console",
+        dpg.create_viewport(title="ARS_MiviaCar - Radar Analysis Console",
                             width=1360, height=860)
         dpg.setup_dearpygui()
         dpg.show_viewport()
@@ -516,7 +516,7 @@ class App:
                             parent="ppi")
             dpg.draw_text((cx + 4, cy - r + 2), f"{k * step:.0f} m",
                           color=GRID_TXT, size=12, parent="ppi")
-        # radial lines every 30°
+        # radial lines every 30 deg
         for deg in range(0, 360, 30):
             a = math.radians(deg)
             r = 4 * step * scale
@@ -524,7 +524,7 @@ class App:
                           (cx + r * math.sin(a), cy - r * math.cos(a)),
                           color=GRID, thickness=1, parent="ppi")
 
-        # FOV wedges (ARS408: far ±9° to 250 m, near ±45° to 70 m)
+        # FOV wedges (ARS408: far +/-9 deg to 250 m, near +/-45 deg to 70 m)
         def wedge(sign, half_deg, rng, col, alpha):
             rr = min(rng, self.range_m) * scale
             a = math.radians(half_deg)
@@ -545,7 +545,7 @@ class App:
         for dec in self.decoders:
             sign = 1 if dec.label == "FRONT" else -1
             col = FRONT_FOV if dec.label == "FRONT" else REAR_FOV
-            base = (t * 90.0) % 180.0 - 90.0     # -90..+90°
+            base = (t * 90.0) % 180.0 - 90.0     # -90..+90 deg
             r = 4 * step * scale
             for i in range(10):
                 a = math.radians(base - i * 2.5)
@@ -633,10 +633,10 @@ class App:
                     dpg.draw_circle((px, py), 1.6, fill=(*col[:3], 170),
                                     color=(0, 0, 0, 0), parent="ppi")
 
-    # ---------------------- Range–Doppler map -------------------------- #
+    # ---------------------- Range-Doppler map -------------------------- #
     def _tab_range_doppler(self):
-        with dpg.tab(label="  Range–Doppler  "):
-            dpg.add_text("Range–Doppler map — every detection paints the "
+        with dpg.tab(label="  Range-Doppler  "):
+            dpg.add_text("Range-Doppler map - every detection paints the "
                          "cell (range, relative velocity) with its RCS; "
                          "the trace fades like a phosphor display.",
                          color=(120, 140, 160))
@@ -656,7 +656,7 @@ class App:
                 dpg.bind_colormap("rd_plot", dpg.mvPlotColormap_Jet)
                 dpg.add_colormap_scale(min_scale=-30, max_scale=40,
                                        height=560, width=90,
-                                       label="RCS (dBm²)",
+                                       label="RCS (dBm2)",
                                        colormap=dpg.mvPlotColormap_Jet)
 
     def _update_range_doppler(self):
@@ -682,14 +682,14 @@ class App:
     # ---------------------- Overview / RCS / CAN ----------------------- #
     def _tab_overview(self):
         with dpg.tab(label="  Sensor State  "):
-            dpg.add_text("ARS408-21 — 76–77 GHz band · cycle ≈ 72 ms "
-                         "(≈ 13.9 Hz) · far field 0.25–250 m (±9°) · "
-                         "near field to 70 m (±45°)",
+            dpg.add_text("ARS408-21 - 76-77 GHz band  |  cycle ~ 72 ms "
+                         "(~ 13.9 Hz)  |  far field 0.25-250 m (+/-9 deg)  |  "
+                         "near field to 70 m (+/-45 deg)",
                          color=(120, 140, 160))
             with dpg.group(horizontal=True):
                 for i, dec in enumerate(self.decoders):
                     with dpg.child_window(width=650, height=-1):
-                        dpg.add_text(f"● {dec.label} radar "
+                        dpg.add_text(f"> {dec.label} radar "
                                      f"(SensorId {dec.sensor_id})",
                                      color=ACCENT)
                         dpg.add_separator()
@@ -704,7 +704,7 @@ class App:
             dpg.add_text("", tag="rcs_stats", color=(120, 140, 160))
             with dpg.group(horizontal=True):
                 with dpg.plot(height=520, width=620, tag="rcs_hist_plot"):
-                    dpg.add_plot_axis(dpg.mvXAxis, label="RCS (dBm²)",
+                    dpg.add_plot_axis(dpg.mvXAxis, label="RCS (dBm2)",
                                       tag="rcsh_x")
                     with dpg.plot_axis(dpg.mvYAxis, label="objects",
                                        tag="rcsh_y"):
@@ -715,7 +715,7 @@ class App:
                     dpg.add_plot_legend()
                     dpg.add_plot_axis(dpg.mvXAxis, label="distance (m)",
                                       tag="rcss_x")
-                    with dpg.plot_axis(dpg.mvYAxis, label="RCS (dBm²)",
+                    with dpg.plot_axis(dpg.mvYAxis, label="RCS (dBm2)",
                                        tag="rcss_y"):
                         for di, dec in enumerate(self.decoders):
                             s = dpg.add_scatter_series([], [],
@@ -725,8 +725,8 @@ class App:
                     dpg.set_axis_limits("rcss_y", -40, 40)
             dpg.set_frame_callback(32, lambda: (
                 dpg.set_axis_limits_auto("rcsh_y"),))
-            dpg.add_text("Reference: pedestrian ≈ -10..0 dBm² · "
-                         "bicycle ≈ -5..5 · car ≈ 0..20 · truck ≈ 20..40",
+            dpg.add_text("Reference: pedestrian ~ -10..0 dBm2  |  "
+                         "bicycle ~ -5..5  |  car ~ 0..20  |  truck ~ 20..40",
                          color=(120, 140, 160))
 
     def _tab_can(self):
@@ -748,7 +748,7 @@ class App:
                     dpg.add_text(cell, color=color)
 
     def refresh_slow(self):
-        """Tables, overview, RCS, range-doppler — every REFRESH_S."""
+        """Tables, overview, RCS, range-doppler - every REFRESH_S."""
         dim = (120, 140, 160)
         green = (63, 220, 130)
         red = (248, 81, 73)
@@ -765,7 +765,7 @@ class App:
             hz = dec.cycle_hz()
             dpg.set_value(f"ov_cycle_{i}",
                           f"measured cycle: {hz:.1f} Hz "
-                          f"(expected ≈ 13.9 Hz / 72 ms)")
+                          f"(expected ~ 13.9 Hz / 72 ms)")
             dpg.configure_item(f"ov_cycle_{i}",
                                color=green if 10 <= hz <= 18 else yellow)
             if st.stamp:
@@ -829,8 +829,8 @@ class App:
                     (f"{o.dist_lat:.1f}", None),
                     (f"{o.vrel_long:.2f}", None),
                     (f"{o.rcs:.1f}", rcs_color(o.rcs)[:3]),
-                    (PROB_EXIST.get(o.prob_exist, "—"), dim),
-                    (MEAS_STATE.get(o.meas_state, "—"), dim),
+                    (PROB_EXIST.get(o.prob_exist, "-"), dim),
+                    (MEAS_STATE.get(o.meas_state, "-"), dim),
                     (DYNPROP.get(o.dyn_prop, "?"), dim),
                 ])
         self._rebuild_table("obj_table", rows)
@@ -838,9 +838,9 @@ class App:
         if all_rcs:
             vals = [r for _, _, r in all_rcs]
             dpg.set_value("rcs_stats",
-                          f"{len(vals)} objects — RCS min {min(vals):.1f} "
+                          f"{len(vals)} objects - RCS min {min(vals):.1f} "
                           f"/ mean {sum(vals) / len(vals):.1f} "
-                          f"/ max {max(vals):.1f} dBm²")
+                          f"/ max {max(vals):.1f} dBm2")
             bins = {}
             for v in vals:
                 b = max(-40, min(40, int(v // 2) * 2))
@@ -872,7 +872,7 @@ class App:
             ])
         self._rebuild_table("can_table", rows)
         dpg.set_value("can_load",
-                      f"interface {self.args.can} — "
+                      f"interface {self.args.can} - "
                       f"{len(self.reader.frames)} IDs, "
                       f"{total:.0f} frames/s"
                       + (f"   |   {self.reader.error}"
@@ -911,7 +911,7 @@ class App:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="ARS_MiviaCar — dual ARS408 radar analysis console")
+        description="ARS_MiviaCar - dual ARS408 radar analysis console")
     parser.add_argument("--can", default="can0", metavar="IFACE",
                         help="CAN interface (default can0)")
     parser.add_argument("--front", type=int, default=0,
