@@ -15,7 +15,7 @@ cd mira-ros2-monitor && sudo ./install.sh
 mira_mivia            # launches the desktop app, auto-detects CAN
 ```
 
-Other modes: `mira_mivia web` (browser GUI) · `mira_mivia tui` (terminal UI).
+Other modes: `mira_mivia web` (browser GUI) · `mira_mivia tui` (terminal UI) · `mira_mivia control` (Control Center, all-in-one browser dashboard). <!-- added 20jul2026 -->
 The launcher sources ROS2 automatically and detects `can0`/`vcan0` by itself.
 
 ## Views (keyboard navigation)
@@ -49,6 +49,39 @@ Features:
   (pure Python stdlib HTTP server + vanilla JS canvas)
 
 
+
+## MIRA Control Center — unified monitor <!-- added 20jul2026 -->
+
+The **all-in-one browser dashboard**: everything visible at once, over SSH,
+no X11 needed for monitoring:
+
+```
+python3 mira_control.py                 # auto-detects can1 > can0 > vcan0
+python3 mira_control.py --can can1      # MiviaCar: radar bus = can1
+# open http://localhost:8090
+# from the laptop:  ssh -L 8090:localhost:8090 miviaware@172.16.174.56
+```
+
+Tabs:
+
+- **Radar State** — full `RadarState` (0x201) per sensor: ONLINE/OFFLINE LED,
+  measured cycle rate vs ~13.9 Hz, max distance, output type, Tx power,
+  quality/ext-info flags, motion input, RCS threshold, NVM status and
+  **error flags** (voltage, temperature, temporary, persistent, interference)
+- **Detections** — live bird's-eye plot (front forward / rear backward) with
+  velocity vectors + full table: class, X/Y, Vx, RCS, probability of
+  existence, measurement state, motion
+- **CAN** — every frame with decoded ARS408 name, rate, data hex + estimated
+  **bus load**
+- **Topics** — all ROS2 topics with Hz, bandwidth, count, type (filterable)
+- **Nodes** — every ROS2 node expandable into its publishers / subscribers /
+  services (textual `rqt_graph`)
+- **TF Tree** — live frame tree from `/tf` + `/tf_static` with translations,
+  static/dynamic badges, STALE detection
+- **RViz2** and **rqt_graph** launch buttons (need a display on the machine)
+
+A status bar shows at all times: node/topic counts, CAN interface + load,
+per-radar ONLINE/OFFLINE, DISPLAY availability, uptime.
 
 ## ARS_MiviaCar — dedicated dual-radar analyzer
 

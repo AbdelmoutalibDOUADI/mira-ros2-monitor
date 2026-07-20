@@ -6,6 +6,7 @@
 #  Usage:
 #    mira_mivia               # desktop GUI, auto CAN detection
 #    mira_mivia web           # browser GUI (http://localhost:8080)
+#    mira_mivia control       # Control Center (http://localhost:8090) - added 20jul2026
 #    mira_mivia tui           # terminal UI
 #    mira_mivia --can vcan0   # force an interface (any extra args pass through)
 # =============================================================================
@@ -45,8 +46,10 @@ done
 # ---- pick the UI mode ----
 MODE="desktop"
 [ "$(basename "$0")" = "ars_miviacar" ] && MODE="radar"
+[ "$(basename "$0")" = "mira_control" ] && MODE="control"   # added 20jul2026
 case "$1" in
     web) MODE="web"; shift ;;
+    control) MODE="control"; shift ;;   # added 20jul2026
     tui) MODE="tui"; shift ;;
     radar) MODE="radar"; shift ;;
     desktop) shift ;;
@@ -54,7 +57,7 @@ esac
 
 # ---- auto-detect CAN interface unless --can given ----
 ARGS=("$@")
-if [[ ! " $* " =~ " --can " ]]; then
+if [[ ! " $* " =~ " --can " ]] && [ "$MODE" != "control" ]; then   # control auto-detects can1 first (radar bus) - added 20jul2026
     for iface in can0 can1 vcan0; do
         if [ -d "/sys/class/net/$iface" ]; then
             ARGS+=(--can "$iface")
@@ -68,6 +71,7 @@ fi
 cd "$MIRA_DIR"
 case "$MODE" in
     web)     exec python3 mira_web.py "${ARGS[@]}" ;;
+    control) exec python3 mira_control.py "${ARGS[@]}" ;;   # added 20jul2026
     tui)     exec python3 mira.py "${ARGS[@]}" ;;
     radar)   exec python3 ars_miviacar.py "${ARGS[@]}" ;;
     desktop) exec python3 mira_desktop.py "${ARGS[@]}" ;;
